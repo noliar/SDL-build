@@ -1,0 +1,23 @@
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+machine:
+  xcode:
+    version: 7.3
+  environment:
+    XCODE_SCHEME: SDL
+    XCODE_PROJECT: submodules/SDL/Xcode/SDL/SDL.xcodeproj
+dependencies:
+  pre:
+    - brew install mono
+test:
+  override:
+    - xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x86 ARCHS=i386 ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"
+    - xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x64 ARCHS="x86_64" ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"
+  post:
+    - mkdir -p output/contents/runtimes/osx-x64/native && mkdir -p output/contents/runtimes/osx-x86/native
+    - nuget pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath $PWD/output -Version 2.0.4;
+    - cp output/x86/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x86.dylib
+    - cp output/x64/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x64.dylib
+    - cp DevZH.SDL.Internal-Darwin.2.0.4.nupkg $CIRCLE_ARTIFACTS/DevZH.SDL.Internal-Darwin.2.0.4.nupkg

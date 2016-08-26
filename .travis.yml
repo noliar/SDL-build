@@ -1,0 +1,37 @@
+sudo: true
+
+os:
+  - linux
+
+# This makes us use Ubuntu 14 instead of 12
+dist: trusty
+
+language: csharp
+mono:
+  - latest
+
+before_install:
+- pushd submodules/SDL
+- git apply -- ../../scripts/linux_shared_patch.patch
+- popd
+- mkdir -p output
+- sudo apt-get update;
+- sudo apt-get install build-essential mercurial make cmake autoconf automake libtool libasound2-dev libpulse-dev libaudio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev libgl1-mesa-dev libesd0-dev libdbus-1-dev libudev-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libibus-1.0-dev -y;
+script:
+  - pushd output
+  - ../submodules/SDL/configure --enable-static=no --prefix=$PWD;
+  - make && make install-lib
+  - popd
+  - mkdir -p output/contents/runtimes/linux-x64/native;
+  - cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native;
+  - cp ./build/DevZH.SDL.Internal-Linux.nuspec ./output
+  - cd output
+  - ls
+  - nuget pack DevZH.SDL.Internal-Linux.nuspec -Version 2.0.4 -verbosity detailed
+
+addons:
+  artifacts:
+    s3_region: "us-east-1"
+    paths:
+    - $(ls ./output/*.nupkg | tr "\n" ":")
+

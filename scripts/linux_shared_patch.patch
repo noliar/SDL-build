@@ -1,0 +1,44 @@
+diff --git a/Makefile.in b/Makefile.in
+index b66e0f5..75ffaab 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -141,12 +141,10 @@ $(objects)/$(TARGET): $(OBJECTS) $(VERSION_OBJECTS)
+ 	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $(OBJECTS) $(VERSION_OBJECTS) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS)
+ 
+ $(objects)/$(SDLMAIN_TARGET): $(SDLMAIN_OBJECTS)
+-	$(RUN_CMD_AR)$(AR) cru $@ $(SDLMAIN_OBJECTS)
+-	$(RUN_CMD_RANLIB)$(RANLIB) $@
++	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $(SDLMAIN_OBJECTS)
+ 
+ $(objects)/$(SDLTEST_TARGET): $(SDLTEST_OBJECTS)
+-	$(RUN_CMD_AR)$(AR) cru $@ $(SDLTEST_OBJECTS)
+-	$(RUN_CMD_RANLIB)$(RANLIB) $@
++	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $(SDLTEST_OBJECTS)
+ 
+ install: all install-bin install-hdrs install-lib install-data
+ install-bin:
+diff --git a/configure b/configure
+index b73ea4d..48d964e 100755
+--- a/configure
++++ b/configure
+@@ -23746,16 +23746,16 @@ VERSION_DEPENDS=`echo "$VERSION_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.rc,\
+ 
+ SDLMAIN_OBJECTS=`echo $SDLMAIN_SOURCES`
+ SDLMAIN_DEPENDS=`echo $SDLMAIN_SOURCES`
+-SDLMAIN_OBJECTS=`echo "$SDLMAIN_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.o,g'`
++SDLMAIN_OBJECTS=`echo "$SDLMAIN_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.lo,g'`
+ SDLMAIN_DEPENDS=`echo "$SDLMAIN_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.c,\\\\
+-\\$(objects)/\\2.o: \\1/\\2.c\\\\
++\\$(objects)/\\2.lo: \\1/\\2.c\\\\
+ 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
+ 
+ SDLTEST_OBJECTS=`echo $SDLTEST_SOURCES`
+ SDLTEST_DEPENDS=`echo $SDLTEST_SOURCES`
+-SDLTEST_OBJECTS=`echo "$SDLTEST_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.o,g'`
++SDLTEST_OBJECTS=`echo "$SDLTEST_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.lo,g'`
+ SDLTEST_DEPENDS=`echo "$SDLTEST_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.c,\\\\
+-\\$(objects)/\\2.o: \\1/\\2.c\\\\
++\\$(objects)/\\2.lo: \\1/\\2.c\\\\
+ 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
+ 
+ # Set runtime shared library paths as needed

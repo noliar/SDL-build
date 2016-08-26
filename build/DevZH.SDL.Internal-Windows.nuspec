@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>DevZH.SDL.Internal-Windows</id>
+        <version>0.0.1-ignored</version>
+        <authors>∂≈œ˛”Ó</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>SDL build package - Windows</description>
+    </metadata>
+    <files>
+        <file src="contents\**" />
+    </files>
+</package>
