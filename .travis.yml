@@ -24,14 +24,11 @@ script:
   - popd
   - mkdir -p output/contents/runtimes/linux-x64/native;
   - cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native;
-  - cp ./build/DevZH.SDL.Internal-Linux.nuspec ./output
-  - cd output
-  - ls
-  - nuget pack DevZH.SDL.Internal-Linux.nuspec -Version 2.0.4 -verbosity detailed
+  - nuget pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath $TRAVIS_BUILD_DIR/output -Version 2.0.4 -verbosity detailed;
 
 addons:
   artifacts:
     s3_region: "us-east-1"
     paths:
-    - $(ls ./output/*.nupkg | tr "\n" ":")
+    - $(ls ./*.nupkg | tr "\n" ":")
 
