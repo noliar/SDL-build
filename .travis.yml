@@ -2,6 +2,7 @@ sudo: true
 
 os:
   - linux
+  - osx
 
 # This makes us use Ubuntu 14 instead of 12
 dist: trusty
@@ -10,28 +11,35 @@ language: csharp
 mono:
   - latest
 
+osx_image: xcode7.3
+
 before_install:
 - mkdir -p output
-- sudo apt-get -qq update;
-- sudo apt-get install build-essential mercurial make cmake autoconf automake libtool libasound2-dev libpulse-dev libaudio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev libgl1-mesa-dev libesd0-dev libdbus-1-dev libudev-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libibus-1.0-dev -y;
-- wget -O "nuget.exe" "https://dist.nuget.org/win-x86-commandline/v3.5.0-rc1/NuGet.exe"
+- curl -o "nuget.exe"  --location "https://dist.nuget.org/win-x86-commandline/v3.5.0-rc1/NuGet.exe"
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get -qq update; fi
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential mercurial make cmake autoconf automake libtool libasound2-dev libpulse-dev libaudio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev libgl1-mesa-dev libesd0-dev libdbus-1-dev libudev-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libibus-1.0-dev -y; fi
 - hg clone http://hg.libsdl.org/SDL submodules/SDL
-- pushd submodules/SDL
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then pushd submodules/SDL; else cd submodules/SDL; fi
 - hg import --no-commit ../../scripts/linux_shared_patch.diff
 - export REV=$(hg tip --template "hg-{rev}:{node|short}")
 - export REVNUM=$(hg tip --template "{rev}")
 - echo "#define SDL_REVISION \"$REV\"" >"$PWD/include/SDL_revision.h"
 - echo "#define SDL_REVISION_NUMBER $REVNUM" >>"$PWD/include/SDL_revision.h"
 - cat "$PWD/include/SDL_revision.h"
-- popd
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then popd; else cd ../../; fi
 script:
-  - pushd output
-  - ../submodules/SDL/configure --enable-static=no --prefix=$PWD;
-  - make && make install-lib
-  - popd
-  - mkdir -p output/contents/runtimes/linux-x64/native;
-  - cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native;
-  - mono nuget.exe pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then pushd output; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ../submodules/SDL/configure --enable-static=no --prefix=$PWD; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make && make install-lib; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then popd; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mkdir -p output/contents/runtimes/linux-x64/native; else mkdir -p output/contents/runtimes/osx-x64/native && mkdir -p output/contents/runtimes/osx-x86/native; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x86 ARCHS=i386 ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x64 ARCHS="x86_64" ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x86/libSDL2.dylib ./output/contents/runtimes/osx-x86/native; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x64/libSDL2.dylib ./output/contents/runtimes/osx-x64/native; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed; fi
 
 addons:
   artifacts:

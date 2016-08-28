@@ -15,6 +15,8 @@ test:
     - xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x64 ARCHS="x86_64" ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"
   post:
     - mkdir -p output/contents/runtimes/osx-x64/native && mkdir -p output/contents/runtimes/osx-x86/native
+    - cp output/x86/libSDL2.dylib output/contents/runtimes/osx-x86/native
+    - cp output/x64/libSDL2.dylib output/contents/runtimes/osx-x64/native
     - nuget pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath $PWD/output -Version 2.0.4 -Suffix "$REVNUM";
     - cp output/x86/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x86.dylib
     - cp output/x64/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x64.dylib
