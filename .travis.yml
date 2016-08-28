@@ -34,11 +34,11 @@ script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then popd; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mkdir -p output/contents/runtimes/linux-x64/native; else mkdir -p output/contents/runtimes/osx-x64/native && mkdir -p output/contents/runtimes/osx-x86/native; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4.1" -Suffix "nightly-$REVNUM" -Verbosity detailed; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x86 ARCHS=i386 ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x64 ARCHS="x86_64" ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x86/libSDL2.dylib ./output/contents/runtimes/osx-x86/native; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x64/libSDL2.dylib ./output/contents/runtimes/osx-x64/native; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4.1" -Suffix "nightly-$REVNUM" -Verbosity detailed; fi
   - NUPKG=$(ls ./*.nupkg | tr -d "\n") && mono nuget.exe push $NUPKG $NUGET_API -Source https://www.myget.org/F/devzh/api/v2/package
 
