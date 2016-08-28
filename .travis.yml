@@ -11,12 +11,19 @@ mono:
   - latest
 
 before_install:
-- pushd submodules/SDL
-- git apply -- ../../scripts/linux_shared_patch.patch
-- popd
 - mkdir -p output
-- sudo apt-get update;
+- sudo apt-get -qq update;
 - sudo apt-get install build-essential mercurial make cmake autoconf automake libtool libasound2-dev libpulse-dev libaudio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev libgl1-mesa-dev libesd0-dev libdbus-1-dev libudev-dev libgles1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libibus-1.0-dev -y;
+- wget -O "nuget.exe" "https://dist.nuget.org/win-x86-commandline/v3.5.0-rc1/NuGet.exe"
+- hg clone http://hg.libsdl.org/SDL submodules/SDL
+- pushd submodules/SDL
+- hg import --no-commit ../../scripts/linux_shared_patch.diff
+- export REV=$(hg tip --template "hg-{rev}:{node|short}")
+- export REVNUM=$(hg tip --template "{rev}")
+- echo "#define SDL_REVISION \"$REV\"" >"$PWD/include/SDL_revision.h"
+- echo "#define SDL_REVISION_NUMBER $REVNUM" >>"$PWD/include/SDL_revision.h"
+- cat "$PWD/include/SDL_revision.h"
+- popd
 script:
   - pushd output
   - ../submodules/SDL/configure --enable-static=no --prefix=$PWD;
@@ -24,7 +31,7 @@ script:
   - popd
   - mkdir -p output/contents/runtimes/linux-x64/native;
   - cp ./output/lib/libSDL2.so ./output/contents/runtimes/linux-x64/native;
-  - nuget pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath $TRAVIS_BUILD_DIR/output -Version 2.0.4 -verbosity detailed;
+  - mono nuget.exe pack ./build/DevZH.SDL.Internal-Linux.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed;
 
 addons:
   artifacts:

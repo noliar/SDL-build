@@ -1,7 +1,3 @@
-checkout:
-  post:
-    - git submodule sync
-    - git submodule update --init
 machine:
   xcode:
     version: 7.3
@@ -10,14 +6,16 @@ machine:
     XCODE_PROJECT: submodules/SDL/Xcode/SDL/SDL.xcodeproj
 dependencies:
   pre:
-    - brew install mono
+    - brew install mono mercurial
+    - hg clone http://hg.libsdl.org/SDL submodules/SDL
+    - pushd submodules/SDL && export REV=$(hg tip --template "hg-{rev}:{node|short}") && export REVNUM=$(hg tip --template "{rev}") && echo "#define SDL_REVISION \"$REV\"" >"$PWD/include/SDL_revision.h" && echo "#define SDL_REVISION_NUMBER $REVNUM" >>"$PWD/include/SDL_revision.h" popd
 test:
   override:
     - xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x86 ARCHS=i386 ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"
     - xcodebuild CONFIGURATION_BUILD_DIR=$PWD/output/x64 ARCHS="x86_64" ONLY_ACTIVE_ARCH=NO MACOSX_DEPLOYMENT_TARGET=10.6 -project submodules/SDL/Xcode/SDL/SDL.xcodeproj -configuration Release -target "Shared Library"
   post:
     - mkdir -p output/contents/runtimes/osx-x64/native && mkdir -p output/contents/runtimes/osx-x86/native
-    - nuget pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath $PWD/output -Version 2.0.4;
+    - nuget pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath $PWD/output -Version 2.0.4 -Suffix "$REVNUM";
     - cp output/x86/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x86.dylib
     - cp output/x64/libSDL2.dylib $CIRCLE_ARTIFACTS/libSDL2_x64.dylib
-    - cp DevZH.SDL.Internal-Darwin.2.0.4.nupkg $CIRCLE_ARTIFACTS/DevZH.SDL.Internal-Darwin.2.0.4.nupkg
+    - cp DevZH.SDL.Internal-Darwin.*.nupkg $CIRCLE_ARTIFACTS/

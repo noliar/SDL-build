@@ -1,8 +1,7 @@
-diff --git a/Makefile.in b/Makefile.in
-index b66e0f5..75ffaab 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -141,12 +141,10 @@ $(objects)/$(TARGET): $(OBJECTS) $(VERSION_OBJECTS)
+diff -r 29d7289e9055 Makefile.in
+--- a/Makefile.in	Sat Aug 20 13:46:45 2016 -0400
++++ b/Makefile.in	Sun Aug 28 08:30:59 2016 +0800
+@@ -141,12 +141,10 @@
  	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $(OBJECTS) $(VERSION_OBJECTS) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS)
  
  $(objects)/$(SDLMAIN_TARGET): $(SDLMAIN_OBJECTS)
@@ -17,11 +16,10 @@ index b66e0f5..75ffaab 100644
  
  install: all install-bin install-hdrs install-lib install-data
  install-bin:
-diff --git a/configure b/configure
-index b73ea4d..48d964e 100755
---- a/configure
-+++ b/configure
-@@ -23746,16 +23746,16 @@ VERSION_DEPENDS=`echo "$VERSION_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.rc,\
+diff -r 29d7289e9055 configure
+--- a/configure	Sat Aug 20 13:46:45 2016 -0400
++++ b/configure	Sun Aug 28 08:30:59 2016 +0800
+@@ -23746,16 +23746,16 @@
  
  SDLMAIN_OBJECTS=`echo $SDLMAIN_SOURCES`
  SDLMAIN_DEPENDS=`echo $SDLMAIN_SOURCES`
