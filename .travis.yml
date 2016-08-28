@@ -40,5 +40,5 @@ script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x86/libSDL2.dylib ./output/contents/runtimes/osx-x86/native; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp ./output/x64/libSDL2.dylib ./output/contents/runtimes/osx-x64/native; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then mono nuget.exe pack ./build/DevZH.SDL.Internal-Darwin.nuspec -BasePath "$TRAVIS_BUILD_DIR/output" -Version "2.0.4" -Suffix "$REVNUM" -Verbosity detailed; fi
-  - $NUPKG=$(ls ./*.nupkg | tr "\n" ":") && mono nuget.exe push $NUPKG $NUGET_API -Source https://www.myget.org/F/devzh/api/v2/package
+  - NUPKG=$(ls ./*.nupkg | tr -d "\n") && mono nuget.exe push $NUPKG $NUGET_API -Source https://www.myget.org/F/devzh/api/v2/package
 
