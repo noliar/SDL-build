@@ -10,5 +10,12 @@ before_build:
 - cd ../../
 build_script:
 - ps: scripts/build_windows.ps1
+deploy:
+  provider: NuGet
+  server: https://www.myget.org/F/devzh/
+  api_key:
+    secure: rZ7DEc0Com5ZMUI/4asIgqUpfXn3TgoktxT7ZzyqXaBd57XymoLtpPLyLHswtfZK
+  skip_symbols: true
+  artifact: /.*\.nupkg/
 artifacts:
 - path: '*.nupkg'
